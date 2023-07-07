@@ -1,12 +1,15 @@
 'use client'
 
-import React, { useState, FormEvent } from "react"
+import React, { useState } from "react"
+import { FormEvent } from "react"
 const { Configuration, OpenAIApi } = require("openai")
+require('dotenv').config();
 
 export default function Home() {
 
+  const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
   const configuration = new Configuration({
-    apiKey: "process.env.REACT_APP_OPENAI_API_KEY",
+    apiKey: apiKey,
   });
 
   const openai = new OpenAIApi(configuration)
@@ -17,6 +20,7 @@ export default function Home() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setCarregando(true);
+    console.log("Chamando a api")
 
     try {
       const result = await openai.createCompletion({
@@ -29,6 +33,7 @@ export default function Home() {
       setResumo(result.data.choices[0].text);
     } catch(e) {
       setResumo("Alguma coisa deu errado, por favor tente novamente.")
+      console.error(e)
     }
     setCarregando(false);
   }
@@ -36,7 +41,7 @@ export default function Home() {
 
 
   return (
-    <main className="min-h-screen items-center justify-center">
+    <main className="h-screen items-center justify-center">
 
       <h1 className="py-12 text-center text-6xl font-bold">Resuma seus textos</h1>
       
@@ -50,9 +55,9 @@ export default function Home() {
 
           <form className="w-full h-full" onSubmit={handleSubmit}>
             <textarea className="w-full h-[80%] bg-[#8661C1] py-2 text-[#EFBCD5]"
-             name="textoBase" id="textoBase" placeholder="Escreva seu texto aqui..."></textarea>
+             name="textoBase" id="textoBase" placeholder="Escreva seu texto aqui..." onChange={(e) => setTextoBase(e.target.value)}></textarea>
              
-             <button className="left-0 bottom-0 text-sm inline-flex items-center py-2.5 px-4 font-medium text-center text-white bg-[#4B5267] rounded-lg mt-8"
+             <button className="flex self-end text-sm items-center py-3 px-5 font-medium text-center text-[#EFBCD5] bg-[#4B5267] rounded-lg mt-8 transition-all hover:bg-slate-700 focus:shadow-inner"
               type="submit">
                Resumir
             </button>

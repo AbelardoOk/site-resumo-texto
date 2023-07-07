@@ -6,7 +6,7 @@ const { Configuration, OpenAIApi } = require("openai")
 export default function Home() {
 
   const configuration = new Configuration({
-    apiKey: "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",
+    apiKey: "process.env.REACT_APP_OPENAI_API_KEY",
   });
 
   const openai = new OpenAIApi(configuration)

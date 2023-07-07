@@ -1,11 +1,39 @@
 'use client'
 
-import React, { useState } from "react"
-import { MostrarResumo } from "@/components/textoResumo"
+import React, { useState, FormEvent } from "react"
+const { Configuration, OpenAIApi } = require("openai")
 
 export default function Home() {
 
-  let [textoBase, setTextoBase] = React.useState('')
+  const configuration = new Configuration({
+    apiKey: "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",
+  });
+
+  const openai = new OpenAIApi(configuration)
+  const [textoBase, setTextoBase] = React.useState("");
+  const [resumo, setResumo] = useState("");
+  const [carregando, setCarregando] = useState(false);
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setCarregando(true);
+
+    try {
+      const result = await openai.createCompletion({
+        model: "text-davinci-003",
+        prompt: `Resuma: ${textoBase}`,
+        temperature: 0.5,
+        max_tokens: 2048,
+      });
+
+      setResumo(result.data.choices[0].text);
+    } catch(e) {
+      setResumo("Alguma coisa deu errado, por favor tente novamente.")
+    }
+    setCarregando(false);
+  }
+
+
 
   return (
     <main className="min-h-screen items-center justify-center">
@@ -20,11 +48,11 @@ export default function Home() {
 
           <h2 className="text-left leading-relaxed font-semibold">Insira o texto a ser resumido</h2>
 
-          <form className="w-full h-full">
+          <form className="w-full h-full" onSubmit={handleSubmit}>
             <textarea className="w-full h-[80%] bg-[#8661C1] py-2 text-[#EFBCD5]"
              name="textoBase" id="textoBase" placeholder="Escreva seu texto aqui..."></textarea>
              
-             <button className="left-0 bottom-0 inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-[#4B5267] rounded-lg mt-8"
+             <button className="left-0 bottom-0 text-sm inline-flex items-center py-2.5 px-4 font-medium text-center text-white bg-[#4B5267] rounded-lg mt-8"
               type="submit">
                Resumir
             </button>
@@ -35,7 +63,7 @@ export default function Home() {
       {/* Direita */}
       <div className="p-12 text-left leading-relaxed">
         <h2 className="font-semibold">Texto resumido</h2>
-        <MostrarResumo/>
+        <p>{resumo}</p>
       </div>
 
     </div>
